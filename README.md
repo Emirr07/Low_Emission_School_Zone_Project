@@ -20,4 +20,4 @@ Proje klasöründe terminali açarak gerekli bağımlılıkları yükleyin ve su
 pip install -r requirements.txt
 
 # API sunucusunu çalıştırın
-python main.py
+python main.py# Low_Emission_School_Zone_Project
