@@ -53,7 +53,7 @@ Harita üzerinde emisyon skorları dinamik olarak analiz edilerek jürinin kolay
 - **🟢 Düşük Emisyon (%0 - %29):** Karbon salınımının güvenli seviyede olduğu akıcı trafik.
 - **🟡 Orta Emisyon (%30 - %69):** Yoğunlaşmaya başlayan şehir trafiği.
 - **🔴 Yüksek Emisyon (%70 - %100):** Emisyon limitlerinin aşıldığı, yoğun ve kilit trafik hacmi.
-- **🔲 Ulaşıma Kapalı Güvenli Koridorlar:** Okul saatlerinde (`08:00` ve `16:00` periyotlarında) emisyonu anında `%0`'a düşen, koyu lacivert renkli ve kesikli (dashed) çizgilerle belirtilen özel yaya koridorları.
+- **🔲 Ulaşıma Kapalı Güvenli Koridorlar:** Okul saatlerinde emisyonu düşen, koyu lacivert renkli ve kesikli çizgilerle belirtilen özel yaya koridorları.
 
 ---
 
