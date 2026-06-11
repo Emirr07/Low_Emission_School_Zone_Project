@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kepez Karbon Emisyonu ve Akıllı Kentsel Ulaştırma Paneli</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f6fa; }
+        #map { width: 100vw; height: 100vh; }
+        #time-control {
+            position: absolute; top: 25px; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);
+            padding: 12px 35px; border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 1000;
+            display: flex; align-items: center; gap: 25px; border: 1px solid rgba(255,255,255,0.6);
+            transition: all 0.3s ease;
+        }
+        #time-control:hover { box-shadow: 0 12px 35px rgba(0,0,0,0.2); background: rgba(255, 255, 255, 0.95); }
+        #slider { width: 380px; cursor: pointer; accent-color: #e74c3c; height: 6px; border-radius: 5px; }
+        #time-display { 
+            font-family: 'Courier New', Courier, monospace; font-size: 24px; font-weight: bold; color: #2c3e50; 
+            background: #ecf0f1; padding: 4px 14px; border-radius: 8px; min-width: 85px; text-align: center;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #dcdde1;
+        }
+        .control-label { font-weight: 700; color: #34495e; text-transform: uppercase; font-size: 11px; letter-spacing: 1.5px; }
+        #legend { position: absolute; bottom: 30px; left: 30px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.2); z-index: 1000; pointer-events: none; }
+        .legend-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 13px; }
+        .box { width: 22px; height: 18px; margin-right: 10px; border-radius: 3px; }
+        .line { width: 22px; height: 4px; margin-right: 10px; border-radius: 2px; }
+        .closed-line { width: 22px; height: 6px; margin-right: 10px; border: 2px dashed #2c3e50; background: #e74c3c; }
+
+        .leaflet-control-layers {
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(10px);
+            border-radius: 16px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+            border: 1px solid rgba(255, 255, 255, 0.5) !important;
+            padding: 12px 16px !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+            color: #2c3e50 !important;
+            transition: all 0.3s ease;
+        }
+        .leaflet-control-layers:hover {
+            background: rgba(255, 255, 255, 0.95) !important;
+            box-shadow: 0 12px 38px rgba(0, 0, 0, 0.18) !important;
+        }
+        .leaflet-control-layers-base, .leaflet-control-layers-overlays {
+            font-size: 13px !important;
+            font-weight: 500 !important;
+            line-height: 1.8 !important;
+        }
+        .leaflet-control-layers-separator {
+            border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+            margin: 8px 0 !important;
+        }
+        .leaflet-control-layers input[type="radio"], 
+        .leaflet-control-layers input[type="checkbox"] {
+            margin-right: 8px !important;
+            cursor: pointer;
+            accent-color: #e74c3c;
+            transform: scale(1.1);
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="time-control">
+        <span class="control-label">Simülasyon Saati</span>
+        <input type="range" id="slider" min="0" max="95" value="32">
+        <span id="time-display">08:00</span>
+    </div>
+
+    <div id="map"></div>
+    
+    <div id="legend">
+        <h4 style="margin-top:0; margin-bottom:12px; color: #2c3e50; border-bottom: 1px solid #eee; padding-bottom: 5px;">CO₂ Emisyon İndeksi</h4>
+        <div class="legend-item"><div class="box" style="background: #9b59b6; border: 1.5px solid #8e44ad;"></div><span>Okul Binaları</span></div>
+        <div class="legend-item"><div class="box" style="background: rgba(255, 165, 0, 0.12); border: 1.5px solid orange;"></div><span>Okul Pedestrian Buffer (200m)</span></div>
+        <div class="legend-item"><div class="closed-line"></div><span style="font-weight: bold; color: #c0392b;">Ulaşıma Kapalı Yol (Okul Saati)</span></div>
+        <div class="legend-item"><div class="line" style="background: #2ecc71;"></div><span>Düşük Emisyon (%0 - %29)</span></div>
+        <div class="legend-item"><div class="line" style="background: #f1c40f;"></div><span>Orta Emisyon (%30 - %69)</span></div>
+        <div class="legend-item"><div class="line" style="background: #e74c3c;"></div><span>Yüksek Emisyon (%70 - %100)</span></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const lightMap = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '© CARTO' });
+        const darkMap = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '© CARTO' });
+        const satelliteMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles © Esri' });
+        
+        const map = L.map('map', { center: [40.1030, 26.3820], zoom: 14, layers: [lightMap] });
+
+        const bufferKatmani = L.layerGroup().addTo(map);
+        const binalarKatmani = L.layerGroup().addTo(map);
+        const emisyonKatmani = L.layerGroup().addTo(map);
+
+        function getEmisyonRengi(deger) {
+            return deger >= 0.70 ? '#e74c3c' : deger >= 0.30 ? '#f1c40f' : '#2ecc71'; 
+        }
+
+        fetch('http://127.0.0.1:8000/api/okullar')
+            .then(res => res.json())
+            .then(data => {
+                L.geoJSON(data, { style: { color: "orange", weight: 1.5, fillColor: "orange", fillOpacity: 0.08 } }).addTo(bufferKatmani);
+            });
+
+        fetch('http://127.0.0.1:8000/api/okul-binalari')
+            .then(res => res.json())
+            .then(data => {
+                L.geoJSON(data, { style: { color: "#8e44ad", weight: 2, fillColor: "#9b59b6", fillOpacity: 0.5 } }).addTo(binalarKatmani);
+            });
+
+        function emisyonGuncelle(saat, dakika) {
+            fetch(`http://127.0.0.1:8000/api/trafik?saat=${saat}&dakika=${dakika}`)
+                .then(res => res.json())
+                .then(data => {
+                    emisyonKatmani.clearLayers();
+                    
+                    L.geoJSON(data, {
+                        style: function(feature) {
+                            let okulSaatiMi = (saat === 8) || (saat === 16);
+                            
+                            if (okulSaatiMi && feature.properties.kapali_mi) {
+                                return { color: '#2c3e50', weight: 6, opacity: 1, dashArray: '6, 8' };
+                            } else {
+                                return { color: getEmisyonRengi(feature.properties.emisyon), weight: 4.5, opacity: 0.85, dashArray: null };
+                            }
+                        },
+                        onEachFeature: function (feature, layer) {
+                            let okulSaatiMi = (saat === 8) || (saat === 16);
+                            
+                            if (okulSaatiMi && feature.properties.kapali_mi) {
+                                layer.bindPopup(`
+                                    <b style="color:#c0392b;">🚨 ULAŞIMA KAPALI BÖLGE</b><br>
+                                    <b>Zaman Dilimi:</b> ${saat.toString().padStart(2,'0')}:${dakika.toString().padStart(2,'0')}<br>
+                                    <b>Durum:</b> Okul Giriş/Çıkış Güvenli Koridoru<br>
+                                    <b>CO₂ Emisyonu:</b> %0 (Sıfır Karbon)
+                                `);
+                            } else {
+                                layer.bindPopup(`<b>Yol ID:</b> ${feature.id}<br><b>Karbon Emisyon Seviyesi:</b> %${Math.round(feature.properties.emisyon * 100)}`);
+                            }
+                        }
+                    }).addTo(emisyonKatmani);
+                })
+                .catch(err => console.error("Veri güncellenirken hata:", err));
+        }
+
+        // BAŞLANGIÇ DEĞERİNİ JAVASCRIPT İLE DE SABİTLEDİK (Sorunu çözen kısım)
+        const slider = document.getElementById('slider');
+        const timeDisplay = document.getElementById('time-display');
+        
+        slider.value = 32; 
+        timeDisplay.innerText = "08:00";
+        emisyonGuncelle(8, 0);
+
+        slider.addEventListener('input', function(e) {
+            const toplamAdim = parseInt(e.target.value);
+            const saat = Math.floor(toplamAdim / 4);
+            const dakika = (toplamAdim % 4) * 15;
+            
+            const saatStr = saat.toString().padStart(2, '0');
+            const dakikaStr = dakika.toString().padStart(2, '0');
+            timeDisplay.innerText = `${saatStr}:${dakikaStr}`;
+            
+            emisyonGuncelle(saat, dakika);
+        });
+
+        const baseMaps = { "Sade Harita": lightMap, "Karanlık Harita": darkMap, "Uydu Görüntüsü": satelliteMap };
+        const overlayMaps = { "Okul Binaları": binalarKatmani, "Okul Etki Alanları (200m)": bufferKatmani, "CO₂ Akışı": emisyonKatmani };
+        L.control.layers(baseMaps, overlayMaps, { collapsed: false }).addTo(map);
+    </script>
+</body>
+</html>
