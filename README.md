@@ -1,3 +1,7 @@
+https://emirr07.github.io/Low_Emission_School_Zone_Project/
+
+
+
 # Kepez İlçesi Akıllı Ulaştırma ve Dinamik Düşük Emisyon Okul Bölgeleri (LEZ) WebGIS Simülasyonu
 
 Bu proje; kentsel ulaştırma planlaması, sürdürülebilirlik ve halk sağlığı odaklı bir **Mekânsal Karar Destek Sistemi (MKDS)** prototipidir. Projenin temel amacı, okul giriş ve çıkış saatlerinde hassas nüfusun (öğrencilerin) maruz kaldığı CO₂ emisyonunu sıfıra indirmek amacıyla okul çevrelerindeki yolların dinamik olarak ulaşıma kapatılmasını ve bu kapatma eyleminin çevre şebekelerdeki emisyon dağılımına olan anlık (15 dakikalık periyotlar) etkilerini CBS tabanlı simüle etmektir.
@@ -63,7 +67,3 @@ Harita üzerinde emisyon skorları dinamik olarak analiz edilerek jürinin kolay
 Projenin çalışması için gerekli olan Python paketleri `requirements.txt` dosyasında listelenmiştir. Yüklemek için terminalde şu komutu çalıştırın:
 ```bash
 pip install -r requirements.txt
-
----
-
-https://emirr07.github.io/Low_Emission_School_Zone_Project/
