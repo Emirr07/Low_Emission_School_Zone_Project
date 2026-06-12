@@ -63,3 +63,6 @@ Harita üzerinde emisyon skorları dinamik olarak analiz edilerek jürinin kolay
 Projenin çalışması için gerekli olan Python paketleri `requirements.txt` dosyasında listelenmiştir. Yüklemek için terminalde şu komutu çalıştırın:
 ```bash
 pip install -r requirements.txt
+
+
+https://emirr07.github.io/Low_Emission_School_Zone_Project/
