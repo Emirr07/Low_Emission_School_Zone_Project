@@ -67,7 +67,7 @@
 <body>
 
     <div id="time-control">
-        <span class="control-label">Simülasyon Saati</span>
+        <span class="control-label">Simulation Hour</span>
         <input type="range" id="slider" min="0" max="95" value="32">
         <span id="time-display">08:00</span>
     </div>
@@ -75,13 +75,13 @@
     <div id="map"></div>
     
     <div id="legend">
-        <h4 style="margin-top:0; margin-bottom:12px; color: #2c3e50; border-bottom: 1px solid #eee; padding-bottom: 5px;">Lejant </h4>
-        <div class="legend-item"><div class="box" style="background: #9b59b6; border: 1.5px solid #8e44ad;"></div><span>Okul Binaları</span></div>
-        <div class="legend-item"><div class="box" style="background: rgba(255, 165, 0, 0.12); border: 1.5px solid orange;"></div><span>Okul Çevresindeki Etki Alanı (200 Metre)</span></div>
-        <div class="legend-item"><div class="closed-line"></div><span style="font-weight: bold; color: #c0392b;">Ulaşıma Kapalı Yol (Okul Saati)</span></div>
-        <div class="legend-item"><div class="line" style="background: #2ecc71;"></div><span>Düşük Emisyon (%0 - %29)</span></div>
-        <div class="legend-item"><div class="line" style="background: #f1c40f;"></div><span>Orta Emisyon (%30 - %69)</span></div>
-        <div class="legend-item"><div class="line" style="background: #e74c3c;"></div><span>Yüksek Emisyon (%70 - %100)</span></div>
+        <h4 style="margin-top:0; margin-bottom:12px; color: #2c3e50; border-bottom: 1px solid #eee; padding-bottom: 5px;">Legend </h4>
+        <div class="legend-item"><div class="box" style="background: #9b59b6; border: 1.5px solid #8e44ad;"></div><span>School Buildings</span></div>
+        <div class="legend-item"><div class="box" style="background: rgba(255, 165, 0, 0.12); border: 1.5px solid orange;"></div><span>School Buffer Zone (200 Meters)</span></div>
+        <div class="legend-item"><div class="closed-line"></div><span style="font-weight: bold; color: #c0392b;">URestricted Road (School Hours)</span></div>
+        <div class="legend-item"><div class="line" style="background: #2ecc71;"></div><span>Low Emission (%0 - %29)</span></div>
+        <div class="legend-item"><div class="line" style="background: #f1c40f;"></div><span>Medium Emission (%30 - %69)</span></div>
+        <div class="legend-item"><div class="line" style="background: #e74c3c;"></div><span>High Emission (%70 - %100)</span></div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -144,7 +144,7 @@
                         }
                     }).addTo(emisyonKatmani);
                 })
-                .catch(err => console.error("Veri güncellenirken hata:", err));
+                .catch(err => console.error("Error:", err));
         }
 
         // BAŞLANGIÇ DEĞERİNİ JAVASCRIPT İLE DE SABİTLEDİK (Sorunu çözen kısım)
@@ -167,8 +167,8 @@
             emisyonGuncelle(saat, dakika);
         });
 
-        const baseMaps = { "Sade Harita": lightMap, "Karanlık Harita": darkMap, "Uydu Görüntüsü": satelliteMap };
-        const overlayMaps = { "Okul Binaları": binalarKatmani, "Okul Etki Alanları (200m)": bufferKatmani, "CO₂ Akışı": emisyonKatmani };
+        const baseMaps = { "Light Map": lightMap, "Dark Map": darkMap, "Satellite Map": satelliteMap };
+        const overlayMaps = { "School Buildings": binalarKatmani, "School Zone (200m)": bufferKatmani, "Roads": emisyonKatmani };
         L.control.layers(baseMaps, overlayMaps, { collapsed: false }).addTo(map);
     </script>
 </body>
