@@ -64,5 +64,6 @@ Projenin çalışması için gerekli olan Python paketleri `requirements.txt` do
 ```bash
 pip install -r requirements.txt
 
+---
 
 https://emirr07.github.io/Low_Emission_School_Zone_Project/
