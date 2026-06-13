@@ -18,7 +18,7 @@ def get_db_connection():
         host="localhost",
         database="leszp",
         user="postgres",
-        password="YOUR_PASSWORD",
+        password="19031903",
         port="5432"
     )
     return conn
