@@ -85,7 +85,6 @@ def get_trafik(saat: int = 12, dakika: int = 0):
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
     
-    # ARTIK SORGUMUZ HEM SAATİ HEM DAKİKAYI SORGULUYOR
     query = """
     SELECT jsonb_build_object(
         'type',     'FeatureCollection',
